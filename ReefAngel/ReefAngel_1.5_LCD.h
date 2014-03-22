@@ -1919,7 +1919,7 @@ void ReefAngelClass::DisplayFeedingMode()
 	t = Timer[FEEDING_TIMER].Trigger - now();
 	if ( (t >= 0) && ! Timer[FEEDING_TIMER].IsTriggered() )
 	{
-		LCD.Clear(DefaultBGColor,60+(intlength(t)*5),100,100,108);
+		//LCD.Clear(DefaultBGColor,60+(intlength(t)*5),100,100,108);
 
 		DrawStandardMain();
 

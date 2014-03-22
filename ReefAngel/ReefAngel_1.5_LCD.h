@@ -1920,7 +1920,10 @@ void ReefAngelClass::DisplayFeedingMode()
 	if ( (t >= 0) && ! Timer[FEEDING_TIMER].IsTriggered() )
 	{
 		LCD.Clear(DefaultBGColor,60+(intlength(t)*5),100,100,108);
-		LCD.DrawText(DefaultFGColor,DefaultBGColor,60,100,t);
+
+		DrawStandardMain();
+
+		LCD.DrawText(DefaultFGColor,DefaultBGColor,60,40,t);
 		delay(200);  // to keep from redraw flicker on timer
 	}
 	else
@@ -1958,6 +1961,9 @@ void ReefAngelClass::DisplayFeedingMode()
 void ReefAngelClass::DisplayWaterChangeMode()
 {
 	LastStart = now();  // Set the time normal mode is started
+
+	DrawStandardMain();
+
 	if ( Joystick.IsButtonPressed() )
 	{
 		// turn on ports

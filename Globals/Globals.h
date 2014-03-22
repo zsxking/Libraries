@@ -842,14 +842,14 @@ T2: 65.0F - 150.0F
 T3: 65.0F - 92.0F
 PH: 7 - 10
 */
-#define T1LOW   700
+#define T1LOW   750
 #define T1HIGH  900
 #define T2LOW   650
-#define T2HIGH  1500
-#define T3LOW   650
-#define T3HIGH  920
-#define PHLOW   550
-#define PHHIGH  840
+#define T2HIGH  950
+#define T3LOW   750
+#define T3HIGH  900
+#define PHLOW   750
+#define PHHIGH  900
 
 /*
 Vortech Modes

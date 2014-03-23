@@ -72,6 +72,7 @@ void ReefAngelClass::Init()
 	TempSensor.Init();
 	RAStart=now();
 	LastStart = RAStart;  // Set the time normal mode is started
+	LastFeedingEnd = RAStart - 864000; // Set feeding end to one day ago
 	BusLocked=false;  // Bus is not locked
 	ChangeMode=0;
 	Flags = 0;

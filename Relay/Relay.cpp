@@ -24,6 +24,7 @@
 #include <Wire.h>
 
 uint32_t LastStart;
+uint32_t LastFeedingEnd;
 byte DelayedOnPorts;
 #ifdef RelayExp
 byte DelayedOnPortsE[MAX_RELAY_EXPANSION_MODULES];
@@ -95,6 +96,38 @@ void RelayClass::DelayedOn(byte ID, byte MinuteDelay)
 void RelayClass::DelayedOn(byte ID)
 {
 	DelayedOn(ID, InternalMemory.DelayedStart_read());
+}
+
+void RelayClass::DelayedFeedingOn(byte ID, byte FeedingMinuteDelay)
+{
+	/*
+	We need to see if the MinuteDelay since LastStart has elapsed before we can turn on our port
+
+	Set the DelayedOnPorts flag indicating that it's a delayed on port
+	*/
+    if ( ID < 9 ) bitSet(DelayedOnPorts, ID-1);
+#ifdef RelayExp
+	if ( (ID > 10) && (ID < 89) )
+	{
+		byte EID = byte(ID/10);
+		bitSet(DelayedOnPortsE[EID-1],(ID%10)-1);
+	}
+#endif  // RelayExp
+
+	uint16_t x = FeedingMinuteDelay;
+	x *= SECS_PER_MIN;
+
+	// uint16_t y = InternalMemory.DelayedStart_read();
+	// y *= SECS_PER_MIN;
+	if (now() - LastFeedingEnd > x)
+	{
+		DelayedOn(ID);
+	}
+}
+
+void RelayClass::DelayedFeedingOn(byte ID)
+{
+	DelayedFeedingOn(ID, InternalMemory.DelayedFeedingStart_read());
 }
 
 void RelayClass::Off(byte ID)

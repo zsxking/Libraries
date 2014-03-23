@@ -37,6 +37,8 @@ public:
 	void On(byte ID);
 	void DelayedOn(byte ID, byte MinuteDelay);
 	void DelayedOn(byte ID);
+	void DelayedFeedingOn(byte, byte);
+	void DelayedFeedingOn(byte);
 	void Off(byte ID);
 	void AllOn();
 	void AllOff();

@@ -521,6 +521,7 @@ When adding more variables, use the previous value plus 1 or 2
 #define VarsEnd					  VarsStart+164
 // Next value starts VarsStart+164
 
+#define Mem_B_DelayedFeedingStart VarsStart+165
 
 // EEProm Pointers
 #define PH_Min		        949
@@ -1343,6 +1344,7 @@ extern byte ButtonPress;  // Defined in ReefAngel.cpp, used for joystick button 
 extern OneWire ds;  // Defined in TempSensor.cpp, used for TempSensorClass
 // delayed on variables, Defined in Relay.cpp
 extern uint32_t LastStart;
+extern uint32_t LastFeedingEnd;
 extern byte DelayedOnPorts;
 #ifdef RelayExp
 extern byte DelayedOnPortsE[MAX_RELAY_EXPANSION_MODULES];

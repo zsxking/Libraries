@@ -1319,6 +1319,15 @@ int InternalEEPROMClass::WaterLevel4Min_read()
     return read_int(Mem_I_WaterLevel4Min);
 }
 
+uint8_t InternalEEPROMClass::DelayedFeedingStart_read()
+{
+    return read(Mem_B_DelayedFeedingStart);
+}
+void InternalEEPROMClass::DelayedFeedingStart_write(const uint8_t value)
+{
+    write(Mem_B_DelayedFeedingStart, value);
+}
+
 // Private functions
 uint8_t InternalEEPROMClass::read(int address)
 {

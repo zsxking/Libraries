@@ -290,6 +290,9 @@ class InternalEEPROMClass {
         void WaterLevel4Max_write(const int value);
         int WaterLevel4Min_read();
         void WaterLevel4Min_write(const int value);
+
+        uint8_t DelayedFeedingStart_read();
+        void DelayedFeedingStart_write(const uint8_t value);
         
         unsigned long IMCheck_read();
         void IMCheck_write(const unsigned long value);

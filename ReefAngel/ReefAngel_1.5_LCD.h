@@ -1863,7 +1863,9 @@ void ReefAngelClass::DrawStandardMain()
 	byte TempRelay = Relay.RelayData;
 	TempRelay &= Relay.RelayMaskOff;
 	TempRelay |= Relay.RelayMaskOn;
-	LCD.DrawOutletBox(12, 93, TempRelay);
+	LCD.DrawOutletBox(5, 93, TempRelay);
+	LCD.DrawATOBox(112, 93);
+
 }
 
 void ReefAngelClass::StoreGraphData()
@@ -1932,6 +1934,8 @@ void ReefAngelClass::DisplayFeedingMode()
 	}
 
 	LastStart = now();  // Set the time normal mode is started
+	LastFeedingEnd = now();  // Set the time feeding mode is ended
+
 	if ( Joystick.IsButtonPressed() )
 	{
 		// joystick button pressed, so we stop the feeding mode

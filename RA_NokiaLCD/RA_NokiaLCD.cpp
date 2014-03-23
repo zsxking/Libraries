@@ -1407,6 +1407,37 @@ void RA_NokiaLCD::DrawOutletBox(byte x, byte y,byte RelayData)
     }
 }
 
+void RA_NokiaLCD::DrawATOBox(byte x, byte y)
+{
+	byte width = 8;
+	byte height = 12;
+    byte bcolor;
+    byte fcolor;
+
+    Clear(OutletBorderColor, x, y, x + width * 2, y);  //94
+    Clear(OutletBorderColor, x, y + height, x + width * 2, y + height);
+
+	if (ReefAngel.LowATO.IsActive()) {
+        bcolor = OutletOnBGColor;
+        fcolor = OutletOnFGColor;
+	} else {
+        bcolor = OutletOffBGColor;
+        fcolor = OutletOffFGColor;
+	}
+    Clear(bcolor, x, y + 1, x + width, y + height - 1);
+    DrawText(fcolor, bcolor, x + 2, y + 3, "L");
+
+	if (ReefAngel.HighATO.IsActive()) {
+        bcolor = OutletOnBGColor;
+        fcolor = OutletOnFGColor;
+	} else {
+        bcolor = OutletOffBGColor;
+        fcolor = OutletOffFGColor;
+	}
+    Clear(bcolor, x + width, y + 1, x + width * 2, y + height - 1);
+    DrawText(fcolor, bcolor, x + 2 + width, y + 3, "H");
+}
+
 void RA_NokiaLCD::DrawSingleMonitor(int Temp, byte fcolor, byte x, byte y, byte decimal)
 {
 	char text[7];

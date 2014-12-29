@@ -841,16 +841,16 @@ formate is:  Probe: LOW - HIGH
 T1: 70.0F - 90.0F
 T2: 65.0F - 150.0F
 T3: 65.0F - 92.0F
-PH: 7 - 10
+PH: 7.5 - 8.5
 */
-#define T1LOW   750
+#define T1LOW   700
 #define T1HIGH  900
-#define T2LOW   650
-#define T2HIGH  950
-#define T3LOW   750
+#define T2LOW   700
+#define T2HIGH  900
+#define T3LOW   700
 #define T3HIGH  900
 #define PHLOW   750
-#define PHHIGH  900
+#define PHHIGH  850
 
 /*
 Vortech Modes

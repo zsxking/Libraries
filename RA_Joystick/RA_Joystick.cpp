@@ -56,6 +56,16 @@ bool RA_JoystickClass::IsButtonPressed()
 		}
 	}
 #endif
+#if defined RANET && defined RA_PLUS
+	if (!digitalRead(okPin))
+	{
+		if (millis()-ButtonDebounce>600)
+		{
+			ButtonDebounce=millis();
+			ButtonPress++;
+		}
+	}
+#endif
 	if (ButtonPress > 0)
 	{
 		ButtonPress = 0;

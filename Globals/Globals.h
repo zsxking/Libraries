@@ -66,14 +66,30 @@ void receiveEventMaster(int howMany);
 #endif //  RA_TOUCH
 
 #if defined RA_STAR
+#include <SD.h>
 #undef RA_PLUS
 #undef wifi
+#define DisplayLEDPWM
 #define ETH_WIZ5100
+#define LEAKDETECTOREXPANSION
 #define EMBEDDED_LEAK
-#define DIGITAL_JOYSTICK
-#define HWSPILCD
-#define MAIN_2014
-#define FONT_8x8
+#define RANET
+#define NOTILT
+#define PWMEXPANSION
+#define IOEXPANSION
+#define RFEXPANSION
+#define SALINITYEXPANSION
+#define ORPEXPANSION
+#define RelayExp
+#define PHEXPANSION
+#define WATERLEVELEXPANSION
+#define MULTIWATERLEVELEXPANSION
+#define AI_LED
+#define HUMIDITYEXPANSION
+#define PAREXPANSION
+#define DCPUMPCONTROL
+#define CUSTOM_VARIABLES
+#define TOUCHCAP
 #endif //  RA_STAR
 
 #if defined(__SAM3X8E__)
@@ -105,6 +121,7 @@ void receiveEventMaster(int howMany);
 #endif // RA_TOUCHDISPLAY
 
 #if defined RA_TOUCH || defined DCPUMPCONTROL
+#define NOTILT
 #endif // RA_TOUCH
 
 const prog_char NoIMCheck[] PROGMEM = "No Internal Memory";
@@ -285,7 +302,7 @@ const prog_char NoIMCheck1[] PROGMEM = "Found";
 #define TPCSPin				28
 #define TouchBL				3
 #else //
-#define TouchBL				44
+#define TouchBL				2
 #define daylight2PWMPin     45
 #define actinic2PWMPin      46
 #define BuzzerPin			48
@@ -334,10 +351,12 @@ const prog_char NoIMCheck1[] PROGMEM = "Found";
 #endif // __PLUS_SPECIAL_WIFI__
 
 #ifdef RANET
-#define RANET_SIZE						42
+#define RANET_SIZE						65
 // 8 Exp. Boxes, 1 Dimming
 // Seq + Size + 8 relay status + 8 relay fallback + 6 dimming channels + 16 dimming channels + CR + LF = 42 bytes
+// NEW Seq + Size + 8 relay status +8 relay fallback + 12 bytes for integer dimming + 32 bytes for integer 16 channel dimming + Trigger + CR + LF = 64 bytes
 static byte RANetSeq, RANetCRC;
+static byte RANetTrigger, TriggerValue;
 static byte RANetData[RANET_SIZE];
 static byte RANetStatus[RANET_SIZE];
 static unsigned long RANetlastmillis;
@@ -373,23 +392,23 @@ static SoftwareSerial RANetSerial(RANetRXPin,RANetTXPin);
 // PWM Override IDs
 #define OVERRIDE_DAYLIGHT		0
 #define OVERRIDE_ACTINIC		1
-#define OVERRIDE_CHANNEL0		2
-#define OVERRIDE_CHANNEL1		3
-#define OVERRIDE_CHANNEL2		4
-#define OVERRIDE_CHANNEL3		5
-#define OVERRIDE_CHANNEL4		6
-#define OVERRIDE_CHANNEL5		7
-#define OVERRIDE_AI_WHITE		8
-#define OVERRIDE_AI_ROYALBLUE	9
-#define OVERRIDE_AI_BLUE		10
-#define OVERRIDE_RF_WHITE		11
-#define OVERRIDE_RF_ROYALBLUE	12
-#define OVERRIDE_RF_RED			13
-#define OVERRIDE_RF_GREEN		14
-#define OVERRIDE_RF_BLUE		15
-#define OVERRIDE_RF_INTENSITY	16
-#define OVERRIDE_DAYLIGHT2		17
-#define OVERRIDE_ACTINIC2		18
+#define OVERRIDE_DAYLIGHT2		2
+#define OVERRIDE_ACTINIC2		3
+#define OVERRIDE_CHANNEL0		4
+#define OVERRIDE_CHANNEL1		5
+#define OVERRIDE_CHANNEL2		6
+#define OVERRIDE_CHANNEL3		7
+#define OVERRIDE_CHANNEL4		8
+#define OVERRIDE_CHANNEL5		9
+#define OVERRIDE_AI_WHITE		10
+#define OVERRIDE_AI_ROYALBLUE	11
+#define OVERRIDE_AI_BLUE		12
+#define OVERRIDE_RF_WHITE		13
+#define OVERRIDE_RF_ROYALBLUE	14
+#define OVERRIDE_RF_RED			15
+#define OVERRIDE_RF_GREEN		16
+#define OVERRIDE_RF_BLUE		17
+#define OVERRIDE_RF_INTENSITY	18
 #define OVERRIDE_16CH_CHANNEL0		19
 #define OVERRIDE_16CH_CHANNEL1		20
 #define OVERRIDE_16CH_CHANNEL2		21
@@ -598,9 +617,10 @@ When adding more variables, use the previous value plus 1 or 2
 #define Mem_B_DCPumpThreshold     VarsStart+164
 #define Mem_I_PHEControlOn        VarsStart+165
 #define Mem_I_PHEControlOff       VarsStart+167
+#define Mem_B_TestMode			  VarsStart+169
 
-#define VarsEnd					  VarsStart+169
-// Next value starts VarsStart+169
+#define VarsEnd					  VarsStart+170
+// Next value starts VarsStart+170
 
 #define Mem_B_DelayedFeedingStart VarsStart+165
 
@@ -724,7 +744,7 @@ When adding more variables, use the previous value plus 1 or 2
 
 #ifndef COLORS_PDE
 
-#if defined RA_TOUCH || defined RA_TOUCHDISPLAY || defined RA_EVOLUTION
+#if defined RA_TOUCH || defined RA_TOUCHDISPLAY || defined RA_EVOLUTION || defined RA_STAR
 // Reef Touch Colors
 #define COLOR_BLACK                 RGB565(0x00, 0x00, 0x00)
 #define COLOR_WHITE                 RGB565(0xFF, 0xFF, 0xFF)
@@ -758,6 +778,8 @@ When adding more variables, use the previous value plus 1 or 2
 #define RELAYGREEN                  RGB565(0x00, 0xAA, 0x00)
 #define DCLABELBAR					RGB565(0xA1, 0xC5, 0x59)
 #define CVARLABELBAR				RGB565(0xF6, 0x03, 0xFF)
+#define STATUSLABELBAR				RGB565(0x9F, 0xA3, 0xC2)
+#define ALERTLABELBAR				RGB565(0xFF, 0x33, 0x22)
 #define PWMWHITE					COLOR_ORANGE
 #define PWMROYALBLUE				RGB565(0x0, 0x66, 0xCC)
 #define PWMRED						COLOR_RED
@@ -1177,7 +1199,9 @@ typedef struct Compensation
 #define IO_SCREEN			15
 #define DCPUMP_SCREEN		16
 #define CVAR_SCREEN			17
-#define MAX_SCREENS			18 // Highest ID for main screens
+#define STATUS_SCREEN		18
+#define ALERT_SCREEN		19
+#define MAX_SCREENS			20 // Highest ID for main screens
 #define DIMMING_OVERRIDE	127
 
 //Menu Screens
@@ -1206,7 +1230,7 @@ typedef struct Compensation
 #define TS_CALIBRATION_DELTA			800
 #define CALIBRATION_TIMER				3
 
-#if defined RA_TOUCH || defined RA_TOUCHDISPLAY || defined RA_EVOLUTION
+#if defined RA_TOUCH || defined RA_TOUCHDISPLAY || defined RA_EVOLUTION || defined RA_STAR
 
 uint16_t read16(File f);
 uint32_t read32(File f);
@@ -1272,43 +1296,32 @@ const prog_char WL_CALI5[] PROGMEM = "it reaches the PVC adapter";
 const prog_char WL_CALI6[] PROGMEM = "%";
 const prog_char NO_WL1[] PROGMEM = "No Water Level Expansion";
 
+// Date/Time
+const prog_char LABEL_MONTH[] PROGMEM = "Month";
+const prog_char LABEL_DAY[] PROGMEM = "Day";
+const prog_char LABEL_YEAR[] PROGMEM = "Year";
+const prog_char LABEL_HOUR[] PROGMEM = "Hour";
+const prog_char LABEL_MINUTE[] PROGMEM = "Minute";
+const prog_char LABEL_AMPM[] PROGMEM = "AM/PM";
+
 // Labels
-const prog_char LABEL_AI_WHITE[] PROGMEM = "White";
-const prog_char LABEL_AI_BLUE[] PROGMEM = "Blue";
-const prog_char LABEL_AI_ROYAL_BLUE[] PROGMEM = "R. Blue";
-static PROGMEM const char *LABEL_AI[] = {LABEL_AI_WHITE, LABEL_AI_BLUE, LABEL_AI_ROYAL_BLUE};
-const prog_char LABEL_RF_WHITE[] PROGMEM = "White";
-const prog_char LABEL_RF_ROYAL_BLUE[] PROGMEM = "R. Blue";
-const prog_char LABEL_RF_RED[] PROGMEM = "Red";
-const prog_char LABEL_RF_BLUE[] PROGMEM = "Green";
-const prog_char LABEL_RF_GREEN[] PROGMEM = "Blue";
-const prog_char LABEL_RF_INTENSITY[] PROGMEM = "Intensity";
-static PROGMEM const char *LABEL_RF[] = {LABEL_RF_WHITE, LABEL_RF_ROYAL_BLUE, LABEL_RF_RED, LABEL_RF_BLUE, LABEL_RF_GREEN, LABEL_RF_INTENSITY};
+const prog_char LABEL_EMPTY[] PROGMEM = "           ";
+const prog_char LABEL_MENU[] PROGMEM = "Menu";
+const prog_char LABEL_REEFANGEL[] PROGMEM = "Reef Angel";
+const prog_char LABEL_PERCENTAGE[] PROGMEM = "%   ";
 const prog_char LABEL_MODE[] PROGMEM = "Mode";
 const prog_char LABEL_DURATION[] PROGMEM = "Duration";
 const prog_char LABEL_SPEED[] PROGMEM = "Speed";
 const prog_char LABEL_OVERRIDE[] PROGMEM = "Override";
+const prog_char LABEL_LIBVER[] PROGMEM = "Libraries Version: ";
+const prog_char LABEL_IPADDRESS[] PROGMEM = "IP Address: ";
+const prog_char LABEL_CLOUD[] PROGMEM = "Cloud Connection: ";
+const prog_char LABEL_CLOUD_CONNECTED[] PROGMEM = "Connected";
+const prog_char LABEL_CLOUD_DISCONNECTED[] PROGMEM = "Disconnected";
+const prog_char LABEL_SD[] PROGMEM = "SD Card: ";
+const prog_char LABEL_SD_INSERTED[] PROGMEM = "Inserted";
+const prog_char LABEL_SD_NOT_FOUND[] PROGMEM = "Not Found";
 
-// Headers
-const prog_char RELAY_BOX_LABEL[] PROGMEM = "Relay Box";
-const prog_char EXP_RELAY_1_LABEL[] PROGMEM = "Exp. Relay Box 1";
-const prog_char EXP_RELAY_2_LABEL[] PROGMEM = "Exp. Relay Box 2";
-const prog_char EXP_RELAY_3_LABEL[] PROGMEM = "Exp. Relay Box 3";
-const prog_char EXP_RELAY_4_LABEL[] PROGMEM = "Exp. Relay Box 4";
-const prog_char EXP_RELAY_5_LABEL[] PROGMEM = "Exp. Relay Box 5";
-const prog_char EXP_RELAY_6_LABEL[] PROGMEM = "Exp. Relay Box 6";
-const prog_char EXP_RELAY_7_LABEL[] PROGMEM = "Exp. Relay Box 7";
-const prog_char EXP_RELAY_8_LABEL[] PROGMEM = "Exp. Relay Box 8";
-const prog_char PWM_EXPANSION_LABEL[] PROGMEM = "PWM Expansion";
-const prog_char SIXTEENCH_PWM_EXPANSION_LABEL[] PROGMEM = "16 Ch PWM Expansion";
-const prog_char RF_EXPANSION_LABEL[] PROGMEM = "RF Expansion";
-const prog_char RF_EXPANSION_LABEL1[] PROGMEM = "RF Expansion";
-const prog_char AI_LABEL[] PROGMEM = "Aqua Illumination";
-const prog_char IO_EXPANSION_LABEL[] PROGMEM = "IO Expansion";
-const prog_char DCPUMP_LABEL[] PROGMEM = "DC Pump";
-const prog_char CVAR_LABEL[] PROGMEM = "Custom Variables";
-
-static PROGMEM const char *relay_items[] = {RELAY_BOX_LABEL, EXP_RELAY_1_LABEL, EXP_RELAY_2_LABEL, EXP_RELAY_3_LABEL, EXP_RELAY_4_LABEL, EXP_RELAY_5_LABEL, EXP_RELAY_6_LABEL, EXP_RELAY_7_LABEL, EXP_RELAY_8_LABEL, PWM_EXPANSION_LABEL, SIXTEENCH_PWM_EXPANSION_LABEL, RF_EXPANSION_LABEL, RF_EXPANSION_LABEL1, AI_LABEL, IO_EXPANSION_LABEL, DCPUMP_LABEL, CVAR_LABEL};
 
 // RF Modes
 const prog_char RF_CONSTANT[] PROGMEM = "Constant";
@@ -1321,8 +1334,8 @@ const prog_char RF_TSM[] PROGMEM = "Tidal Swell";
 const prog_char RF_FEEDING[] PROGMEM = "Feeding";
 const prog_char RF_NIGHT[] PROGMEM = "Night";
 const prog_char RF_SLAVE[] PROGMEM = "Slave Check";
-const prog_char RF_None[] PROGMEM = "None";
-static PROGMEM const char *rf_items[] = {RF_CONSTANT, RF_LAGOONAL, RF_REEFCREST, RF_SHORTWAVE, RF_LONGWAVE, RF_NTM, RF_TSM, RF_FEEDING, RF_FEEDING, RF_NIGHT};
+//const prog_char RF_None[] PROGMEM = "None";
+static PROGMEM const char *RF_MODE[] = {RF_CONSTANT, RF_LAGOONAL, RF_REEFCREST, RF_SHORTWAVE, RF_LONGWAVE, RF_NTM, RF_TSM, RF_FEEDING, RF_FEEDING, RF_NIGHT};
 
 const prog_char FEEDING_LABEL[] PROGMEM = "Feeding Mode";
 const prog_char WATER_CHANGE_LABEL[] PROGMEM = "Water Change";
@@ -1516,6 +1529,13 @@ byte NutrientTransportMode(byte PulseMinSpeed, byte PulseMaxSpeed, int PulseDura
 byte TidalSwellMode(byte WaveMaxSpeed, boolean PulseSync);
 byte TideMode(byte WaveSpeed, byte minOffset, byte maxOffset);
 byte ElseMode(byte midPoint, byte offset, boolean waveSync);
+
+const char* ip_to_str(const uint8_t* ipAddr);
+
+static void callback(char* topic, byte* payload, unsigned int length) {
+  // handle message arrived
+}
+
 
 // for virtual functions
 //extern "C" void __cxa_pure_virtual(void);
